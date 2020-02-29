@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2019 PayGate (Pty) Ltd
+ * Copyright (c) 2020 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -33,19 +33,45 @@ $PayWeb3->setEncryptionKey( $encryption_key );
 // Check that the checksum returned matches the checksum we generate.
 $isValid = $PayWeb3->validateChecksum( $data );
 
+//Do PayWeb query to get full set of results
+if ( $isValid ) {
+    $queryRequest                   = [];
+    $queryRequest['PAYGATE_ID']     = $paygate_id;
+    $queryRequest['PAY_REQUEST_ID'] = $data['PAY_REQUEST_ID'];
+    $queryRequest['REFERENCE']      = $data['REFERENCE'];
+
+    $PayWeb3->setQueryRequest( $queryRequest );
+    $cnt     = 0;
+    $isValid = false;
+    while ( !$isValid && $cnt < 10 ) {
+        if ( $PayWeb3->doQuery() ) {
+            $queryResponse = $PayWeb3->queryResponse;
+            $isValid       = $PayWeb3->validateChecksum( $queryResponse );
+            if ( $isValid ) {
+                $transaction_status = $queryResponse['TRANSACTION_STATUS'];
+            }
+        } else {
+            $cnt++;
+        }
+    }
+}
+
 // Prepare body HTML.
 $body_html       = '';
 $create_new_html = "<p>To create a new transaction, <a href={$url}>click here.<a/></p>";
 $try_again_html  = "<p>To try again, <a href={$url}?tryagain=true>click here.<a/></p>" . $create_new_html;
 
 if ( $isValid ) {
-    $body_html .= "<h2>Transaction {$PayWeb3->getTransactionStatusDescription( $data['TRANSACTION_STATUS'] )}</h2>";
-    if ( $data['TRANSACTION_STATUS'] != 1 ) {
+    $body_html .= "<h2>Transaction {$PayWeb3->getTransactionStatusDescription( $transaction_status )}</h2>";
+    if ( $transaction_status != 1 ) {
+        (int) $logger > 0 ? $log->notice( 'Transaction not authorized', $queryResponse ) : '';
         $body_html .= $try_again_html;
     } else {
+        (int) $logger > 0 ? $log->notice( 'Transaction authorized', $queryResponse ) : '';
         $body_html .= $create_new_html;
     }
 } else {
+    (int) $logger > 0 ? $log->warning( 'Checksum validation on return failed', ['received_data' => $data] ) : '';
     $body_html .= "<h2>Transaction Invalid</h2>";
     $body_html .= $try_again_html;
 }

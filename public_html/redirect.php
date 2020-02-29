@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2019 PayGate (Pty) Ltd
+ * Copyright (c) 2020 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -25,10 +25,13 @@ $data = array(
     'EMAIL'            => filter_var( $_POST['EMAIL'], FILTER_SANITIZE_EMAIL ),
 );
 
+(int) $logger > 0 ? $log->info( 'Data for submission to PayGate: ', $data ) : '';
+
 // Set the session vars once we have cleaned the inputs.
 $_SESSION['reference'] = $data['REFERENCE'];
 $_SESSION['amount']    = $data['AMOUNT'];
 $_SESSION['email']     = $data['EMAIL'];
+$_SESSION['currency']  = $data['CURRENCY'];
 
 // Initiate the PayWeb 3 helper class.
 $PayWeb3         = new PayGate_PayWeb3();
@@ -42,6 +45,19 @@ $PayWeb3->setInitiateRequest( $data );
 
 // Do the curl post to PayGate.
 $returnData = $PayWeb3->doInitiate();
+
+if ( !$returnData ) {
+    //There has been an error processing the request
+    $html = <<<HTML
+<div class="alert alert-danger">
+<p>There has been an error processing the payment</p>
+<p>The returned error message is: $PayWeb3->lastError</p>
+<p>A message "PGID_NOT_EN" most likely means the currency selected is not allowed</p>
+<a href="$url">Click here to try again</a>
+</div>
+HTML;
+    echo $html;
+}
 
 $payment_form = '';
 
@@ -62,9 +78,12 @@ HTML;
         }
     }
     // Submit form as/when needed.
+    $logger == '2' ? $log->info( 'Submitting form to PayGate: ', $PayWeb3->processRequest ) : '';
     $payment_form .= <<<HTML
                     <input class="btn btn-success btn-block" id="check-sum" type="submit" name="btnSubmit" value="Redirect" />
 HTML;
+} else {
+    $logger == '2' ? $log->error( 'Submitting form to PayGate: ', ['form' => $payment_form] ) : '';
 }
 echo <<<HTML
                 <h2>Redirect Page</h2>
