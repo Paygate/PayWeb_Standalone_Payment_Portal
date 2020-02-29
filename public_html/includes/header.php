@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2019 PayGate (Pty) Ltd
+ * Copyright (c) 2020 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -11,6 +11,18 @@
 session_name( 'paygate_payweb3_testing_sample' );
 session_start();
 require_once 'includes/_env.php';
+
+/**
+ * Setup Monolog as the default logger
+ */
+require_once 'vendor/autoload.php';
+
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
+
+$log    = new Logger( 'PayGate_PW3_Logger' );
+$stream = new RotatingFileHandler( '../logs/paygate_pw3.log' );
+$log->pushHandler( $stream );
 
 // Setup date objects.
 $today      = new DateTime( '' );
