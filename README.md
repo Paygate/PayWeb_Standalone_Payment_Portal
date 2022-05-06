@@ -1,12 +1,12 @@
 # PayWeb_Standalone_Payment_Portal
-## PayGate Standalone Payment Portal v1.0.1
+## PayGate Standalone Payment Portal v1.0.2
 
 This is the PayGate PayWeb3 Standalone Payment Portal. Please feel free to contact the PayGate support team at support@paygate.co.za should you require any assistance.
 
 ## Installation
 [![How To Setup a PayGate PayWeb3 Standalone Payment Portal](https://appinlet.com/wp-content/uploads/2021/06/How-To-Setup-a-PayGate-PayWeb3-Standalone-Payment-Portal-.jpg)](https://www.youtube.com/watch?v=cKIhEPX2tA4 "How To Setup a PayGate PayWeb3 Standalone Payment Portal")
 
-Please navigate to the [releases page](https://github.com/PayGate/PayWeb_Standalone_Payment_Portal/releases), download the latest release (v1.0.1) and unzip. You will then be able to follow the integration guide PDF which is included in the zip.
+Please navigate to the [releases page](https://github.com/PayGate/PayWeb_Standalone_Payment_Portal/releases), download the latest release (v1.0.2) and unzip. You will then be able to follow the integration guide PDF which is included in the zip.
 
 ## Collaboration
 
