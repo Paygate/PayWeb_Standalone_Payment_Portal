@@ -1,14 +1,13 @@
 <?php
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2021 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
  * Released under the GNU General Public License
  */
 
-// Sessions used here only because we can't get the PayGate ID, Transaction reference and secret key on the result page.
-session_name( 'paygate_payweb3_testing_sample' );
+// Sessions used here only for the sticky page
 session_start();
 require_once 'includes/_env.php';
 
