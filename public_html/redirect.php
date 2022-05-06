@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2021 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -13,12 +13,13 @@ include_once "includes/header.php";
 require_once 'classes/paygate.payweb3.php';
 
 // Prepare PayGate PayWeb Data.
+$reference = filter_var( $_POST['REFERENCE'], FILTER_SANITIZE_STRING );
 $data = array(
     'PAYGATE_ID'       => $paygate_id,
-    'REFERENCE'        => filter_var( $_POST['REFERENCE'], FILTER_SANITIZE_STRING ),
+    'REFERENCE'        => $reference,
     'AMOUNT'           => filter_var( $_POST['AMOUNT'] * 100, FILTER_SANITIZE_NUMBER_INT ),
     'CURRENCY'         => filter_var( $_POST['CURRENCY'], FILTER_SANITIZE_STRING ),
-    'RETURN_URL'       => filter_var( $_POST['RETURN_URL'], FILTER_SANITIZE_URL ),
+    'RETURN_URL'       => filter_var( $_POST['RETURN_URL'], FILTER_SANITIZE_URL ) . '?reference=' . $reference,
     'TRANSACTION_DATE' => filter_var( $_POST['TRANSACTION_DATE'], FILTER_SANITIZE_STRING ),
     'LOCALE'           => filter_var( $_POST['LOCALE'], FILTER_SANITIZE_STRING ),
     'COUNTRY'          => filter_var( $_POST['COUNTRY'], FILTER_SANITIZE_STRING ),

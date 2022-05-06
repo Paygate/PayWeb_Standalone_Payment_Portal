@@ -1,10 +1,10 @@
 <?php
 /*
- * Copyright (c) 2019 PayGate (Pty) Ltd
+ * Copyright (c) 2021 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  * URI: https://github.com/PayGate/PayWeb_Standalone_Payment_Portal
- * Version: 1.0.0
+ * Version: 1.0.2
  *
  * Released under the GNU General Public License
  */
@@ -81,7 +81,7 @@ if ( isset( $_POST ) && count( $_POST ) > 0 ) {
     $content = <<<'CONTENT'
 <?php
 /*
- * Copyright (c) 2019 PayGate (Pty) Ltd
+ * Copyright (c) 2021 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -193,6 +193,11 @@ echo <<<FORM
     <label for="encryption_key">Encryption Key</label>
     <input type="text" class="form-control" id="encryption_key" name="encryption_key" aria-describedby="encryption_key" placeholder="Enter your encryption key" required>
     <small id="encryption_keyHelp" class="form-text text-muted">This is your encryption key, e.g. secret.</small>
+  </div>
+  
+  <div class="form-group">
+    <label for="recaptcha_key">Recaptcha Key</label>
+    <input type="text" class="form-control" id="recaptcha_key" name="recaptcha_key" aria-describedby="recaptcha_key" placeholder="Enter your recaptcha_key" required>
   </div>
   <div class="form-group">
     <label for="expiry_date">Expiry Date</label>
@@ -371,6 +376,12 @@ foreach (\$currencies as \$code) {
     }
 }
 echo <<<EOT
+                <script src="https://www.google.com/recaptcha/api.js"></script>
+                 <script>
+                   function onSubmit(token) {
+                     document.getElementById("payweb-standalone-form").submit();
+                   }
+                 </script>
                 <h2>Create Transaction</h2>
                     <form action="redirect" method="post" name="paygate_initiate_form">
                         <div class="form-group">
@@ -398,7 +409,8 @@ echo <<<EOT
                         <input type="hidden" name="TRANSACTION_DATE" id="TRANSACTION_DATE" value="\$today_formatted"/>
                         <input type="hidden" name="LOCALE" id="LOCALE" value="en-za" hidden/>
                         <input type="hidden" name="COUNTRY" id="COUNTRY" value="ZAF" hidden/>
-                        <input type="submit" name="btnSubmit" class="btn btn-success btn-block" id="check-sum" value="Pay Now"/>
+                        <input type="submit" name="btnSubmit" class="btn btn-success btn-block g-recaptcha" data-sitekey="$recaptcha_key" 
+        data-callback='onSubmit' data-action='submit' id="check-sum" value="Pay Now"/>
                         <input type="hidden" name="submitted" value="TRUE"/>
 
                     </form>

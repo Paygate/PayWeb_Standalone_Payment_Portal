@@ -1,6 +1,11 @@
-= 1.0.1 - March 01, 2020 =
-* Add Currency Options and Logging for development and testing.
-* Minor fixes and improvements.
+=====================================
+Date	  : Version: Description
+=====================================
 
-= 1.0.0 - December 21, 2019 =
-* Initial Release.
+2022-05-06: v1.0.2 : Add reCAPTCHA to help protect stop bots and other automated attacks.
+                     Remove use of session.
+
+2020-03-01: v1.0.1 : Add Currency Options and Logging for development and testing.
+                     Minor fixes and improvements.
+
+2019-12-21: v1.0.0 : Initial release.

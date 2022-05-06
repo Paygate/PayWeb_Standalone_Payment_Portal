@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2021 PayGate (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -15,12 +15,14 @@ require_once 'classes/paygate.payweb3.php';
 // Get current time.
 $time = $_SERVER['REQUEST_TIME'];
 
+$reference = filter_var($_GET['reference'], FILTER_SANITIZE_STRING);
+
 // Insert the returned data as well as the merchant specific data PAYGATE_ID and REFERENCE in array.
 $data = array(
     'PAYGATE_ID'         => $paygate_id,
     'PAY_REQUEST_ID'     => isset( $_POST['PAY_REQUEST_ID'] ) ? $_POST['PAY_REQUEST_ID'] : '',
     'TRANSACTION_STATUS' => isset( $_POST['TRANSACTION_STATUS'] ) ? $_POST['TRANSACTION_STATUS'] : '',
-    'REFERENCE'          => isset( $_SESSION['reference'] ) ? $_SESSION['reference'] : '',
+    'REFERENCE'          => isset( $reference ) ? $reference : '',
     'CHECKSUM'           => isset( $_POST['CHECKSUM'] ) ? $_POST['CHECKSUM'] : '',
 );
 
