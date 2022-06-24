@@ -118,6 +118,8 @@ CONTENT;
     $content .= '$company_email                           = "' . $company_email . '"; // Company Email, e.g. email@domain.com.' . PHP_EOL;
     $content .= '$company_telephone                       = "' . $company_telephone . '"; // Company Telephone, e.g. +2712-345-6789' . PHP_EOL;
     $content .= '$permitted_currencies                    = "' . $permitted_currencies . '"; // Permitted currencies, e.g. ZAR, USD' . PHP_EOL;
+    $content .= '$recaptcha_key                           = "' . $recaptcha_key . '";' . PHP_EOL;
+    $content .= '$recaptcha_secret                        = "' . $recaptcha_secret . '";' . PHP_EOL;
     $content .= PHP_EOL . '// Logo Images: set \'true\' to display or \'false\' to hide.' . PHP_EOL;
     $content .= '$Amex                                    = ' . ( isset( $Amex ) ? 'true' : 'false' ) . ';' . PHP_EOL;
     $content .= '$DPO_SA                                  = ' . ( isset( $DPO_SA ) ? 'true' : 'false' ) . ';' . PHP_EOL;
@@ -198,6 +200,10 @@ echo <<<FORM
   <div class="form-group">
     <label for="recaptcha_key">Recaptcha Key</label>
     <input type="text" class="form-control" id="recaptcha_key" name="recaptcha_key" aria-describedby="recaptcha_key" placeholder="Enter your recaptcha_key" required>
+  </div>
+  <div class="form-group">
+    <label for="recaptcha_secret">Recaptcha Secret</label>
+    <input type="text" class="form-control" id="recaptcha_secret" name="recaptcha_secret" aria-describedby="recaptcha_secret" placeholder="Enter your recaptcha_secret" required>
   </div>
   <div class="form-group">
     <label for="expiry_date">Expiry Date</label>
@@ -379,11 +385,12 @@ echo <<<EOT
                 <script src="https://www.google.com/recaptcha/api.js"></script>
                  <script>
                    function onSubmit(token) {
-                     document.getElementById("payweb-standalone-form").submit();
+                     document.getElementById("paygate_initiate_form").submit();
                    }
                  </script>
                 <h2>Create Transaction</h2>
-                    <form action="redirect" method="post" name="paygate_initiate_form">
+                    <form action="redirect" method="post" name="paygate_initiate_form" id="paygate_initiate_form">
+                        <input type="hidden" name="action" value="payweb_standalone_payment">
                         <div class="form-group">
                             <label id="form-labels" for="AMOUNT">Amount</label>
                             <input class="form-control" type="number" id="AMOUNT" placeholder="0.00" required name="AMOUNT" min="5"
@@ -409,8 +416,8 @@ echo <<<EOT
                         <input type="hidden" name="TRANSACTION_DATE" id="TRANSACTION_DATE" value="\$today_formatted"/>
                         <input type="hidden" name="LOCALE" id="LOCALE" value="en-za" hidden/>
                         <input type="hidden" name="COUNTRY" id="COUNTRY" value="ZAF" hidden/>
-                        <input type="submit" name="btnSubmit" class="btn btn-success btn-block g-recaptcha" data-sitekey="$recaptcha_key" 
-        data-callback='onSubmit' data-action='submit' id="check-sum" value="Pay Now"/>
+                        <input type="submit" name="btnSubmit" class="btn btn-success btn-block g-recaptcha" data-sitekey="\$recaptcha_key" 
+        data-callback='onSubmit' data-action='payweb_standalone_payment' id="check-sum" value="Pay Now"/>
                         <input type="hidden" name="submitted" value="TRUE"/>
 
                     </form>

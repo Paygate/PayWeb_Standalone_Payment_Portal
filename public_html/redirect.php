@@ -12,6 +12,11 @@ include_once "includes/header.php";
 // Include the helper PayWeb 3 class.
 require_once 'classes/paygate.payweb3.php';
 
+// Initiate the PayWeb 3 helper class.
+$PayWeb3         = new PayGate_PayWeb3();
+
+$PayWeb3->validate_form();
+
 // Prepare PayGate PayWeb Data.
 $reference = filter_var( $_POST['REFERENCE'], FILTER_SANITIZE_STRING );
 $data = array(
@@ -34,8 +39,7 @@ $_SESSION['amount']    = $data['AMOUNT'];
 $_SESSION['email']     = $data['EMAIL'];
 $_SESSION['currency']  = $data['CURRENCY'];
 
-// Initiate the PayWeb 3 helper class.
-$PayWeb3         = new PayGate_PayWeb3();
+
 $the_process_url = $PayWeb3::$process_url;
 
 // Set the encryption key of your PayGate PayWeb3 configuration.
