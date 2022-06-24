@@ -374,4 +374,31 @@ class PayGate_PayWeb3
             return false;
         }
     }
+
+    public function validate_form(){
+        global $recaptcha_secret;
+        $referer_location = $_SERVER['HTTP_REFERER'];
+        $token            = $_POST['g-recaptcha-response'];
+        $action           = $_POST['action'];
+        $secret           = $recaptcha_secret;
+
+        // call curl to POST request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $secret, 'response' => $token)));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $arrResponse = json_decode($response, true);
+
+        // verify the response
+        if ($arrResponse["success"] == '1' && $arrResponse["action"] == $action && $arrResponse["score"] >= 0.5) {
+            return true;
+        } else {
+            // spam submission
+            header('Location:' . $referer_location);
+            exit(0);
+        }
+    }
 }
