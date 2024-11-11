@@ -1,13 +1,15 @@
 <?php
+/** @noinspection PhpMissingStrictTypesDeclarationInspection */
+
 /*
- * Copyright (c) 2021 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
  * Released under the GNU General Public License
  */
 
-include_once "includes/header.php";
+include_once 'includes/header.php';
 
 // This is the Terms and Conditions Page.
 $isTerms = true;
@@ -26,13 +28,13 @@ echo <<<EOT
                     <li>Return and Refunds policy<br />
                     $returns_and_refund_policy.</li>
                     <li>Customer Privacy policy<br />
-                    $your_company shall take all reasonable steps to protect the personal information of users. For the purpose of this clause, "personal information" shall be defined as detailed in the Promotion of Access to Information Act 2 of 2000 (PAIA). The PAIA may be downloaded from: <a href="http://www.polity.org.za/attachment.php?aa_id=3569" target="_blank">http://www.polity.org.za/attachment.php?aa_id=3569</a>.</li>
+                    $your_company shall take all reasonable steps to protect the personal information of users. For the purpose of this clause, "personal information" shall be defined as detailed in the Promotion of Access to Information Act 2 of 2000 (PAIA). The PAIA may be downloaded from: <a href="https://www.polity.org.za/attachment.php?aa_id=3569" target="_blank">https://www.polity.org.za/attachment.php?aa_id=3569</a>.</li>
                     <li>Payment options accepted<br />
                     Payment may be made via $payment_options_accepted.</li>
                     <li>Card acquiring and security<br />
-                    Card transactions will be acquired for $your_company via PayGate (Pty) Ltd who are the approved payment gateway for all South African Acquiring Banks. PayGate uses the strictest form of encryption, namely Secure Socket Layer 3 (SSL3) and no Card details are stored on the website. Users may go to <a href="www.paygate.co.za" target="_blank">www.paygate.co.za</a> to view their security certificate and security policy.</li>
+                    Card transactions will be acquired for $your_company via Paygate (Pty) Ltd who are the approved payment gateway for all South African Acquiring Banks. Paygate uses the strictest form of encryption, namely Secure Socket Layer 3 (SSL3) and no Card details are stored on the website. Users may go to <a href="www.paygate.co.za" target="_blank">www.paygate.co.za</a> to view their security certificate and security policy.</li>
                     <li>Customer details separate from card details<br />
-                    Customer details will be stored by $your_company separately from card details which are entered by the client on PayGate’s secure site. For more detail on PayGate refer to <a href="www.paygate.co.za" target="_blank">www.paygate.co.za</a>.</li>
+                    Customer details will be stored by $your_company separately from card details which are entered by the client on Paygate’s secure site. For more detail on Paygate refer to <a href="www.paygate.co.za" target="_blank">www.paygate.co.za</a>.</li>
                     <li>Merchant Outlet country and transaction currency<br />
                     The merchant outlet country at the time of presenting payment options to the cardholder is South Africa. Transaction currency is South African Rand (ZAR).</li>
                     <li>Responsibility<br />
@@ -49,4 +51,4 @@ echo <<<EOT
                     Telephone: <a href="tel:$company_telephone">$company_telephone</a></li>
                 </ol>
 EOT;
-include_once "includes/footer.php";
+include_once 'includes/footer.php';

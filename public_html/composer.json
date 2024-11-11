@@ -1,6 +1,7 @@
 {
-    "name": "paygate/payweb-standalone",
-    "require": {
-        "monolog/monolog": "^2.0"
-    }
+  "name": "paygate/payweb-standalone",
+  "require": {
+    "monolog/monolog": "^2.0",
+    "ext-curl": "*"
+  }
 }

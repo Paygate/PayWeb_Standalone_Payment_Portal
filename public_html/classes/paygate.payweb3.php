@@ -1,113 +1,85 @@
 <?php
+/** @noinspection PhpMissingStrictTypesDeclarationInspection */
+
 /*
- * Copyright (c) 2021 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
  * Released under the GNU General Public License
  */
 
+require_once 'includes/_env.php';
+
 /**
- * Class to do initiate and Query functions to PayGate for PayWeb 3
+ * Class to do initiate and Query functions to Paygate
  *
- * @author PayGate
+ * @author Paygate
  * @version 0.2
  *
  */
-class PayGate_PayWeb3
+class PayGatePayWeb3
 {
     /**
-     * @var string the url of the PayGate PayWeb 3 initiate page
+     * @var string the url of the Paygate process page
      */
-    public static $initiate_url = 'https://secure.paygate.co.za/payweb3/initiate.trans';
+    public static string $processUrl = 'https://secure.paygate.co.za/payweb3/process.trans';
     /**
-     * @var string the url of the PayGate PayWeb 3 process page
+     * @var array contains the data to be posted to Paygate initiate
      */
-    public static $process_url = 'https://secure.paygate.co.za/payweb3/process.trans';
-    /**
-     * @var string the url of the PayGate PayWeb 3 query page
-     */
-    public static $query_url = 'https://secure.paygate.co.za/payweb3/query.trans';
-    /**
-     * @var array contains the data to be posted to PayGate PayWeb 3 initiate
-     */
-    public $initiateRequest;
+    public array $initiateRequest;
     /**
      * @var array contains the response data from the initiate
      */
-    public $initiateResponse;
-    /**
-     * @var array contains the data returned from the initiate, required for the redirect of the client
-     */
-    public $processRequest;
-    /**
-     * @var array contains the data to be posted to PayGate PayWeb 3 query service
-     */
-    public $queryRequest;
-    /**
-     * @var array contains the response data from the query
-     */
-    public $queryResponse;
-    /**
-     * @var string
-     *
-     * Most common errors returned will be:
-     *
-     * DATA_CHK    -> Checksum posted does not match the one calculated by PayGate, either due to an incorrect encryption key used or a field that has been excluded from the checksum calculation
-     * DATA_PW     -> Mandatory fields have been excluded from the post to PayGate, refer to page 9 of the documentation as to what fields should be posted.
-     * DATA_CUR    -> The currency that has been posted to PayGate is not supported.
-     * PGID_NOT_EN -> The PayGate ID being used to post data to PayGate has not yet been enabled, or there are no payment methods setup on it.
-     *
-     */
-    public $lastError;
-
-    private $transactionStatusArray = array(
+    public array $initiateResponse;
+    private array $txnStatusArray = [
         1 => 'Approved',
         2 => 'Declined',
         4 => 'Cancelled',
-    );
+    ];
 
-    public $debug = false;
-    public $ssl   = false;
+    public bool $debug = false;
+    public bool $ssl = false;
 
     /**
-     * @var string (as set up on the PayWeb 3 config page in the PayGate Back Office )
+     * @var string (as set up on the config page in the Paygate Back Office )
      */
-    private $encryptionKey;
+    public string $encryptionKey = '';
 
     public function __construct()
     {
-
+        $this->initiateRequest  = [];
+        $this->initiateResponse = [];
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->debug;
     }
 
     /**
-     * @param boolean $debug
+     * @param bool $debug
      */
-    public function setDebug( $debug )
+    public function setDebug(bool $debug): void
     {
         $this->debug = $debug;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isSsl()
+    public function isSsl(): bool
     {
         return $this->ssl;
     }
 
     /**
-     * @param boolean $ssl
+     * @param bool $ssl
      */
-    public function setSsl( $ssl )
+    public function setSsl(bool $ssl): void
     {
         $this->ssl = $ssl;
     }
@@ -115,47 +87,26 @@ class PayGate_PayWeb3
     /**
      * @return array
      */
-    public function getInitiateRequest()
+    public function getInitiateReq(): array
     {
         return $this->initiateRequest;
     }
 
     /**
-     * @param array $postData
-     */
-    public function setInitiateRequest( $postData )
-    {
-        $this->initiateRequest = $postData;
-    }
-
-    /**
-     * @return array
-     */
-    public function getQueryRequest()
-    {
-        return $this->queryRequest;
-    }
-
-    /**
-     * @param array $queryRequest
-     */
-    public function setQueryRequest( $queryRequest )
-    {
-        $this->queryRequest = $queryRequest;
-    }
-
-    /**
      * @return string
      */
-    public function getEncryptionKey()
+    public function getEncryptionKey(): string
     {
-        return $this->encryptionKey;
+        // Access the global variable
+        global $encryption_key;
+
+        return $this->encryptionKey = $encryption_key;
     }
 
     /**
      * @param string $encryptionKey
      */
-    public function setEncryptionKey( $encryptionKey )
+    public function setEncryptionKey(string $encryptionKey): void
     {
         $this->encryptionKey = $encryptionKey;
     }
@@ -163,24 +114,27 @@ class PayGate_PayWeb3
     /**
      * @return bool
      */
-    public function _is_curl_installed()
+    public function isCurlInstalled(): bool
     {
-        if ( in_array( 'curl', get_loaded_extensions() ) ) {
-            return true;
+        if (in_array('curl', get_loaded_extensions())) {
+            $isCurlInstalled = true;
         } else {
-            return false;
+            $isCurlInstalled = false;
         }
+
+        return $isCurlInstalled;
     }
 
     /**
-     * returns a description of the transaction status number passed back from PayGate
+     * returns a description of the transaction status number passed back from Paygate
      *
      * @param int $statusNumber
+     *
      * @return string
      */
-    public function getTransactionStatusDescription( $statusNumber )
+    public function getTxnStatusDesc(int $statusNumber): string
     {
-        return $this->transactionStatusArray[$statusNumber];
+        return $this->txnStatusArray[$statusNumber];
     }
 
     /**
@@ -188,194 +142,27 @@ class PayGate_PayWeb3
      * DateTime available from PHP 5.2.0
      *
      * @param string $format
+     *
      * @return string
      */
-    public function getDateTime( $format )
+    public function getDateTime(string $format): string
     {
-
-        if ( version_compare( PHP_VERSION, '5.2.0', '<' ) ) {
-            $dateTime = date( 'Y-m-d H:i:s' );
-            return $dateTime;
+        if (version_compare(PHP_VERSION, '5.2.0', '<')) {
+            return date('Y-m-d H:i:s');
         } else {
             $dateTime = new DateTime();
-            return $dateTime->format( $format );
+
+            return $dateTime->format($format);
         }
     }
 
     /**
-     * Function to generate the checksum to be passed in the initiate call. Refer to examples on Page 15 of the PayWeb3 documentation
+     * Validate the form
      *
-     * @param array $postData
-     * @return string (md5 hash value)
+     * @return true|void
      */
-    public function generateChecksum( $postData )
+    public function validateForm()
     {
-        $checksum = '';
-
-        foreach ( $postData as $key => $value ) {
-            if ( $value != '' ) {
-                $checksum .= $value;
-            }
-        }
-
-        $checksum .= $this->getEncryptionKey();
-
-        if ( $this->isDebug() ) {
-            error_log( 'Checksum Source: ' . $checksum, 0 );
-        }
-
-        return md5( $checksum );
-    }
-
-    /**
-     * function to compare checksums
-     *
-     * @param array $data
-     * @return bool
-     */
-    public function validateChecksum( $data )
-    {
-
-        $returnedChecksum = $data['CHECKSUM'];
-        unset( $data['CHECKSUM'] );
-
-        $checksum = $this->generateChecksum( $data );
-
-        return ( $returnedChecksum == $checksum );
-    }
-
-    /**
-     * Function to handle response from initiate request and set error or processRequest as need be
-     *
-     * @return bool
-     */
-    public function handleInitiateResponse()
-    {
-        if ( array_key_exists( 'ERROR', $this->initiateResponse ) ) {
-            $this->lastError = $this->initiateResponse['ERROR'];
-            unset( $this->initiateResponse );
-            return false;
-        }
-
-        $this->processRequest = array(
-            'PAY_REQUEST_ID' => $this->initiateResponse['PAY_REQUEST_ID'],
-            'CHECKSUM'       => $this->initiateResponse['CHECKSUM'],
-        );
-        return true;
-    }
-
-    /**
-     * Function to handle response from Query request and set error as need be
-     *
-     * @return bool
-     */
-    public function handleQueryResponse()
-    {
-        if ( array_key_exists( 'ERROR', $this->queryResponse ) ) {
-            $this->lastError = $this->queryResponse['ERROR'];
-            unset( $this->queryResponse );
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Function to do curl post to PayGate to initiate a PayWeb 3 transaction
-     *
-     * @return bool
-     */
-    public function doInitiate()
-    {
-
-        $this->initiateRequest['CHECKSUM'] = $this->generateChecksum( $this->initiateRequest );
-
-        $result = $this->doCurlPost( $this->initiateRequest, self::$initiate_url );
-
-        if ( $result !== false ) {
-            parse_str( $result, $this->initiateResponse );
-            $result = $this->handleInitiateResponse();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Function to do curl post to PayGate to query a PayWeb 3 transaction
-     *
-     * @return bool
-     */
-    public function doQuery()
-    {
-        $this->queryRequest['CHECKSUM'] = $this->generateChecksum( $this->queryRequest );
-
-        $result = $this->doCurlPost( $this->queryRequest, self::$query_url );
-
-        if ( $result !== false ) {
-            parse_str( $result, $this->queryResponse );
-            $result = $this->handleQueryResponse();
-        }
-
-        return $result;
-    }
-
-    /**
-     * function to do actual curl post to PayGate
-     *
-     * @param array $postData data to be posted
-     * @param string $url to be posted to
-     * @return bool | string
-     */
-    public function doCurlPost( $postData, $url )
-    {
-
-        if ( $this->_is_curl_installed() ) {
-
-            $fields_string = '';
-
-            //url-ify the data for the POST
-            foreach ( $postData as $key => $value ) {
-                $fields_string .= $key . '=' . urlencode( $value ) . '&';
-            }
-            //remove trailing '&'
-            $fields_string = rtrim( $fields_string, '&' );
-
-            if ( $this->isDebug() ) {
-                error_log( 'Post via Curl: ' . $fields_string, 0 );
-            }
-
-            //open connection
-            $ch = curl_init();
-
-            //set the url, number of POST vars, POST data
-            if ( !$this->isSsl() ) {
-                curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-                curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 0 );
-            }
-            curl_setopt( $ch, CURLOPT_URL, $url );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-            curl_setopt( $ch, CURLOPT_NOBODY, false );
-            curl_setopt( $ch, CURLOPT_REFERER, $_SERVER['HTTP_HOST'] );
-            curl_setopt( $ch, CURLOPT_POST, 1 );
-            curl_setopt( $ch, CURLOPT_POSTFIELDS, $fields_string );
-
-            //execute post
-            $result = curl_exec( $ch );
-
-            //close connection
-            curl_close( $ch );
-
-            if ( $this->isDebug() ) {
-                error_log( 'Return from Curl: ' . $result, 0 );
-            }
-
-            return $result;
-        } else {
-            $this->lastError = 'cURL is NOT installed on this server. http://php.net/manual/en/curl.setup.php';
-            return false;
-        }
-    }
-
-    public function validate_form(){
         global $recaptcha_secret;
         $referer_location = $_SERVER['HTTP_REFERER'];
         $token            = $_POST['g-recaptcha-response'];
@@ -383,17 +170,17 @@ class PayGate_PayWeb3
         $secret           = $recaptcha_secret;
 
         // call curl to POST request
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $secret, 'response' => $token)));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $curlHandle = curl_init();
+        curl_setopt($curlHandle, CURLOPT_URL, 'https://www.google.com/recaptcha/api/siteverify');
+        curl_setopt($curlHandle, CURLOPT_POST, 1);
+        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, http_build_query(['secret' => $secret, 'response' => $token]));
+        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curlHandle);
+        curl_close($curlHandle);
         $arrResponse = json_decode($response, true);
 
         // verify the response
-        if ($arrResponse["success"] == '1' && $arrResponse["action"] == $action && $arrResponse["score"] >= 0.5) {
+        if ($arrResponse['success'] == '1' && $arrResponse['action'] == $action && $arrResponse['score'] >= 0.5) {
             return true;
         } else {
             // spam submission
