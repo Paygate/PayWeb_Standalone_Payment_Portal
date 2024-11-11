@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -9,49 +9,60 @@
 .container {
     margin-top: 15px;
 }
+
 h1, h2, p {
     text-align: center;
 }
+
 form {
     text-align: center;
     margin-top: 15px;
 }
+
 #form-labels {
     width: 25%;
     text-align: left;
 }
+
 .form-control {
     width: 25%;
     margin: auto;
 }
+
 #check-sum {
     width: 15%;
     margin: auto;
     padding: 5px;
 }
+
 #result-page {
     text-align: center;
 }
+
 #payment-options-logo {
     width: 25%;
     margin: auto;
     text-align: center;
     padding-top: 15px;
 }
+
 #footer-text {
     font-size: small;
     font-weight: 400;
     padding-top: 0.5rem;
     text-align: center;
 }
+
 #footer-text a {
     color: #212529;
 }
+
 #payment-options-logo img {
     height: 32px;
     width: auto;
     padding: 0.25em 0.5em;
 }
+
 @media (max-width: 1024px) {
     #form-labels,
     #payment-options-logo,
@@ -59,16 +70,19 @@ form {
         width: 35%;
     }
 }
+
 @media (max-width: 767px) {
     #form-labels,
     #payment-options-logo,
     .form-control {
         width: 50%;
     }
+
     #check-sum {
         width: 25%;
     }
 }
+
 @media (max-width: 480px) {
     #form-labels,
     #payment-options-logo,

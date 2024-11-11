@@ -1,10 +1,11 @@
 <?php
+
 /*
- * Copyright (c) 2021 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  * URI: https://github.com/PayGate/PayWeb_Standalone_Payment_Portal
- * Version: 1.0.2
+ * Version: 1.1.0
  *
  * Released under the GNU General Public License
  */
@@ -12,21 +13,21 @@ require_once 'classes/paygate_currencies.php';
 
 $images        = [];
 $logos         = '';
-$protocol      = isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off" ) ? "https" : "http";
-$serverBaseUrl = rtrim( $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], "/" );
+$protocol      = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
+$serverBaseUrl = rtrim($protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], "/");
 
-$assets = scandir( 'assets' );
-foreach ( $assets as $asset ) {
-    if ( strlen( $asset ) > 2 && substr( $asset, 0, 1 ) != "." ) {
-        $name  = strstr( $asset, '.', true );
-        $name  = str_replace( '-', '_', $name );
-        $label = ucwords( str_replace( ['-', '_'], ' ', $name ) );
-        $id    = strtolower( $name );
-        array_push( $images, $name );
-        $logos .= <<<LOGO
+$assets = scandir('assets');
+foreach ($assets as $asset) {
+    if (strlen($asset) > 2 && !str_starts_with($asset, ".")) {
+        $name     = strstr($asset, '.', true);
+        $name     = str_replace('-', '_', $name);
+        $label    = ucwords(str_replace(['-', '_'], ' ', $name));
+        $id       = strtolower($name);
+        $images[] = $name;
+        $logos    .= <<<LOGO
   <div class="form-check">
     <input type="checkbox" class="form-check-input" id="$id" name="$name" aria-describedby="{$name}_check"  >
-    <label class="form-check-label" for="{$name}_check">{$label}<span><img src="assets/{$asset}" alt="{$label}"></span></label>
+    <label class="form-check-label" for="{$name}_check">$label<span><img src="assets/$asset" alt="$label"></span></label>
   </div>
 LOGO;
     }
@@ -41,47 +42,47 @@ $logos .= <<<SAVE
 SAVE;
 
 //Populate dropdown for currencies
-$currencies       = PayGate_Currencies::getCurrencies();
+$currencies       = Currencies::getCurrencies();
 $currency_options = '<option value="0">-- Select currencies --</option>';
-foreach ( $currencies as $currency ) {
+foreach ($currencies as $currency) {
     $currency_options .= '<option value="' . $currency['CurrencyCode'] . '">' . $currency['CurrencyCode'] . ' - ' . $currency['Currency'] . '</option>';
 }
 $permitted_currencies = "ZAR"; //Default currency if none selected
 
-if ( isset( $_POST ) && count( $_POST ) > 0 ) {
+if (isset($_POST) && count($_POST) > 0) {
     $post = $_POST;
-    $fh   = fopen( 'includes/_env.php', 'w' );
-    foreach ( $post as $item => $value ) {
-        $item    = str_replace( '-', '_', $item );
-        $item    = filter_var( $item, FILTER_SANITIZE_STRING );
-        ${$item} = trim( ${$item} );
+    $fh   = fopen('includes/_env.php', 'w');
+    foreach ($post as $item => $value) {
+        $item    = str_replace('-', '_', $item);
+        $item    = htmlspecialchars($item, ENT_QUOTES, 'UTF-8');
+        ${$item} = trim(${$item});
 
-        if ( $item === 'company_email' ) {
-            ${$item} = filter_var( $value, FILTER_SANITIZE_EMAIL );
-        } elseif ( $item === 'baseUrl' ) {
-            ${$item} = filter_var( $value, FILTER_SANITIZE_URL );
-        } elseif ( in_array( $item, $images ) ) {
-            if ( $value == 'on' ) {
+        if ($item === 'company_email') {
+            ${$item} = filter_var($value, FILTER_SANITIZE_EMAIL);
+        } elseif ($item === 'baseUrl') {
+            ${$item} = filter_var($value, FILTER_SANITIZE_URL);
+        } elseif (in_array($item, $images)) {
+            if ($value == 'on') {
                 ${$item} = true;
             } else {
                 ${$item} = false;
             }
-        } elseif ( is_array( $value ) ) {
+        } elseif (is_array($value)) {
             $s = '';
-            foreach ( $value as $v ) {
+            foreach ($value as $v) {
                 $s .= $v . ',';
             }
-            $s       = rtrim( $s, ',' );
+            $s       = rtrim($s, ',');
             ${$item} = $s;
         } else {
-            ${$item} = filter_var( $value, FILTER_SANITIZE_STRING );
+            ${$item} = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         }
     }
 
     $content = <<<'CONTENT'
 <?php
 /*
- * Copyright (c) 2021 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd
  *
@@ -121,30 +122,30 @@ CONTENT;
     $content .= '$recaptcha_key                           = "' . $recaptcha_key . '";' . PHP_EOL;
     $content .= '$recaptcha_secret                        = "' . $recaptcha_secret . '";' . PHP_EOL;
     $content .= PHP_EOL . '// Logo Images: set \'true\' to display or \'false\' to hide.' . PHP_EOL;
-    $content .= '$Amex                                    = ' . ( isset( $Amex ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$DPO_SA                                  = ' . ( isset( $DPO_SA ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$Mastercard_Securecode                   = ' . ( isset( $Mastercard_Securecode ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$verified_by_visa                        = ' . ( isset( $verified_by_visa ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$Diners_Club                             = ' . ( isset( $Diners_Club ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$mastercard                              = ' . ( isset( $mastercard ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$SCode                                   = ' . ( isset( $SCode ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$masterpass                              = ' . ( isset( $masterpass ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$SiD_Secure_EFT                          = ' . ( isset( $SiD_Secure_EFT ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$PayGate_Risk_Engine_Logo_PayProtector   = ' . ( isset( $PayGate_Risk_Engine_Logo_PayProtector ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$PayGate_Certified_Developer_Seal        = ' . ( isset( $PayGate_Certified_Developer_Seal ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$PayGate_PayPartner_Logo                 = ' . ( isset( $PayGate_PayPartner_Logo ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$Visa                                    = ' . ( isset( $Visa ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$Visa_Checkout                           = ' . ( isset( $Visa_Checkout ) ? 'true' : 'false' ) . ';' . PHP_EOL;
-    $content .= '$PayPal                                  = ' . ( isset( $PayPal ) ? 'true' : 'false' ) . ';' . PHP_EOL;
+    $content .= '$Amex                                    = ' . (isset($Amex) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$DPO_SA                                  = ' . (isset($DPO_SA) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$Mastercard_Securecode                   = ' . (isset($Mastercard_Securecode) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$verified_by_visa                        = ' . (isset($verified_by_visa) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$Diners_Club                             = ' . (isset($Diners_Club) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$mastercard                              = ' . (isset($mastercard) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$SCode                                   = ' . (isset($SCode) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$masterpass                              = ' . (isset($masterpass) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$SiD_Secure_EFT                          = ' . (isset($SiD_Secure_EFT) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$PayGate_Risk_Engine_Logo_PayProtector   = ' . (isset($PayGate_Risk_Engine_Logo_PayProtector) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$PayGate_Certified_Developer_Seal        = ' . (isset($PayGate_Certified_Developer_Seal) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$PayGate_PayPartner_Logo                 = ' . (isset($PayGate_PayPartner_Logo) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$Visa                                    = ' . (isset($Visa) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$Visa_Checkout                           = ' . (isset($Visa_Checkout) ? 'true' : 'false') . ';' . PHP_EOL;
+    $content .= '$PayPal                                  = ' . (isset($PayPal) ? 'true' : 'false') . ';' . PHP_EOL;
 
-    fwrite( $fh, $content );
-    fclose( $fh );
-    unlink( 'index.php' );
+    fwrite($fh, $content);
+    fclose($fh);
+    unlink('index.php');
 
-    $fh = fopen( 'index.php', 'w' );
-    fwrite( $fh, prepare_final_install_page() );
-    fclose( $fh );
-    header( 'Location: ' . $baseUrl );
+    $fh = fopen('index.php', 'w');
+    fwrite($fh, prepare_final_install_page());
+    fclose($fh);
+    header('Location: ' . $baseUrl);
 }
 
 echo <<<EOT
@@ -187,9 +188,9 @@ echo <<<FORM
     <small id="baseUrlHelp" class="form-text text-muted">This is the base url for your site, e.g. $serverBaseUrl (don't add a / at the end of your url).</small>
   </div>
   <div class="form-group">
-    <label for="paygate_id">PayGate ID</label>
-    <input type="text" class="form-control" id="paygate_id" name="paygate_id" aria-describedby="paygate_id" placeholder="Enter your PayGate ID" required>
-    <small id="paygate_idHelp" class="form-text text-muted">This is your PayGate ID, e.g. 10011072130.</small>
+    <label for="paygate_id">Paygate ID</label>
+    <input type="text" class="form-control" id="paygate_id" name="paygate_id" aria-describedby="paygate_id" placeholder="Enter your Paygate ID" required>
+    <small id="paygate_idHelp" class="form-text text-muted">This is your Paygate ID, e.g. 10011072130.</small>
   </div>
   <div class="form-group">
     <label for="encryption_key">Encryption Key</label>
@@ -336,7 +337,7 @@ function prepare_final_install_page()
     return <<<PAGE
 <?php
 /*
- * Copyright (c) 2020 PayGate (Pty) Ltd
+ * Copyright (c) 2024 Payfast (Pty) Ltd
  *
  * Author: App Inlet (Pty) Ltd]
  * URI: https://github.com/PayGate/PayWeb_Standalone_Payment_Portal
@@ -349,7 +350,7 @@ include_once "includes/header.php";
 include_once "classes/paygate_currencies.php";
 
 /**
- * Checks for return from PayGate and handles it
+ * Checks for return from Paygate and handles it
  */
 if (isset(\$_POST) && isset(\$_POST['TRANSACTION_STATUS'])) {
     include_once 'result.php';
@@ -372,7 +373,7 @@ if (isset(\$_GET['tryagain'])) {
 
 //Get currencies
 \$currency_options = '';
-\$currencies       = PayGate_Currencies::getCurrencies(\$permitted_currencies);
+\$currencies       = Currencies::getCurrencies(\$permitted_currencies);
 foreach (\$currencies as \$code) {
     if (\$code['CurrencyCode'] == \$currency) {
 
