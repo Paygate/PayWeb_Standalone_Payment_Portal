@@ -18,7 +18,7 @@ support@payfast.help should you require any assistance.
     - Upload the content of the **public_html** folder into your server's document root directory. The portal should work on
   any web hosting provider that supports PHP 8.1 and higher. Contact your web hosting provider if you are unsure.
 
-3. **Configure the Plugin**
+3. **Configure the Integration**
 
     - Navigate to the domain of your web browser. The **Installation Wizard** will load. Enter all the relevant fields,
   mimicking the format of the examples provided as prompted. Be careful to leave out full stops at the end of each text
